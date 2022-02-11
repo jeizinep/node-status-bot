@@ -13,6 +13,13 @@
 
 ### 🏠 [Homepage](https://dlt.green)
 
+## Getting started
+
+You'l need to install python3
+```shell
+sudo apt-get update
+sudo apt-get install python
+```
 ## Author
 
 👤 **Snowli**
@@ -28,6 +35,3 @@ Give a ⭐️ if this project helped you!
 
 Copyright © 2022 [Snowli](https://github.com/Snowli11).<br />
 This project is [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html) licensed.
-
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
