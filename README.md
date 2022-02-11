@@ -16,7 +16,9 @@
 ## Getting started
 
 First you need to create a new Discord bot on [the official website](https://discord.com/developers/applications)
-![Alt text](images\Applications.png?raw=true "Title")
+<br>
+<a href="https://github.com/Snowli11/node-status-bot/blob/main/images/Applications.png?raw=true></a>
+
 
 You'l need to install python3 and pip
 ```shell
