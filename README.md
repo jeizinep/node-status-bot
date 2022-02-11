@@ -15,11 +15,37 @@
 
 ## Getting started
 
-You'l need to install python3
+First you need to create a new Discord bot on [the official website](https://discord.com/developers/applications)
+![Alt text](images\Applications.png?raw=true "Title")
+
+You'l need to install python3 and pip
 ```shell
 sudo apt-get update
 sudo apt-get install python
+sudo apt install python3-pip
 ```
+
+then you can install the python libraries
+```shell
+cd ~/node-status-bot
+sudo pip install requirements.txt
+```
+
+then chose the method of getting the pool state (api is recommended)
+```shell
+cd /bot_api
+```
+
+modify the config to your liking ("token" is your bots api token, "channel_id" is your desired channel id, "api" is the api url from which you get your pool state [recommended is dlt.greens pool mana](https://dlt.green/dns/dltgreen_poolmana))
+```shell
+nano config.json
+```
+
+now you are ready to start the skript
+```shell
+python3 bot.py
+```
+
 ## Author
 
 👤 **Snowli**
