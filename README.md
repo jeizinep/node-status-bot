@@ -19,6 +19,8 @@ First you need to create a new Discord bot on [the official website](https://dis
 ![Create application](https://github.com/Snowli11/node-status-bot/blob/main/images/Applications.png?raw=true)
 
 Go to bot
+
+
 ![Choose bot](https://github.com/Snowli11/node-status-bot/blob/main/images/Choose%20Bot.png?raw=true)
 
 Add bot
@@ -31,12 +33,19 @@ Create bot url
 ![bot url](https://github.com/Snowli11/node-status-bot/blob/main/images/Create%20bot%20url.png?raw=true)
 
 Open generated link and invite bot to your discord
+
+
+
 ![invite bot](https://github.com/Snowli11/node-status-bot/blob/main/images/Select%20server.png?raw=true)
 
 Go back to bot
+
+
 ![Choose bot](https://github.com/Snowli11/node-status-bot/blob/main/images/Choose%20Bot.png?raw=true)
 
 Copy bot token
+
+
 ![Bot token](https://github.com/Snowli11/node-status-bot/blob/main/images/Copy%20token.png?raw=true)
 
 
