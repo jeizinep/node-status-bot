@@ -18,6 +18,11 @@
 First you need to create a new Discord bot on [the official website](https://discord.com/developers/applications)
 ![Create application](https://github.com/Snowli11/node-status-bot/blob/main/images/Applications.png?raw=true)
 
+Choose bot
+![Choose bot](https://github.com/Snowli11/node-status-bot/blob/main/images/Coose_bot.png?raw=true)
+
+
+
 
 You'l need to install python3 and pip
 ```shell
