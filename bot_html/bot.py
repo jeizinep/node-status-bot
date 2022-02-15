@@ -19,7 +19,9 @@ TOKEN = config['token']
 
 bot = commands.Bot(command_prefix='/')
 old_all_nodes_status = []
-flag = 0
+old_list_healthy = []
+old_list_unhealthy = []
+flag = 1
 
 @bot.event
 async def on_ready():
@@ -32,10 +34,14 @@ async def on_ready():
 
 @tasks.loop(seconds=20)
 async def update():
-    list_nodes = []
     global flag
     global ctx
     global old_all_nodes_status
+    global old_list_healthy
+    global old_list_unhealthy
+    list_nodes = []
+    list_healthy = []
+    list_unhealthy = []
     raw = open(config['directory_path_html_file']) #loads the temp.json
     temp = json.load(raw)
     raw.close()
@@ -52,62 +58,51 @@ async def update():
         print(f"all_nodes_status = {all_nodes_status}")
         lie = all(all_nodes_status) # checks if there is a False in the array
         if lie == False: #if there is a False in the array lie = False
-            res = [i for i, val in enumerate(all_nodes_status) if not val]
-            res2 = [i for i, val in enumerate(old_all_nodes_status) if not val]
-            difference = set(res).symmetric_difference(set(res2))
-            list_difference = list(difference)
-            print(f"list_difference = {list_difference}")
-            node_chanches = [list_nodes[i] for i in list_difference] #preparing the list
-            print(f"node_chanches = {node_chanches}")
-            if flag != 0:
-                print(f"flag = {flag}")
-                if res != res2:
-                    list_difference_boolean = [all_nodes_status[i] for i in list_difference]
-                    print(f"list_difference_boolean = {list_difference_boolean}")
-                    list_now_healthy_index = [i for i, val in enumerate(list_difference_boolean) if val]
-                    list_now_unhealthy_index = [i for i, val in enumerate(list_difference_boolean) if not val]
-                    print(f"list_now_healthy_index = {list_now_healthy_index}")
-                    print(f"list_now_unhealthy_index = {list_now_unhealthy_index}")
-                    if list_now_healthy_index:
-                        z = 0
-                        list_now_healthy = []
-                        for i in list_now_healthy_index:
-                            index_for_now_healthy = list_now_healthy_index[z]
-                            now_healthy = node_chanches[index_for_now_healthy]
-                            print(f"now healthy = {now_healthy}")
-                            list_now_healthy.append(now_healthy)
-                            z +=1
-                        x = 0  
-                        for i in list_now_healthy: #send all unhealthy nodes
-                            await ctx.send(f"```yaml\n+ {list_now_healthy[x]} is now healthy\n```")
-                            x +=1
-                            time.sleep(0.5)
-                    if list_now_unhealthy_index:
-                        z = 0
-                        list_now_unhealthy = []
-                        for i in list_now_unhealthy_index:
-                            index_for_now_unhealthy = list_now_unhealthy_index[z]
-                            now_unhealthy = node_chanches[index_for_now_unhealthy]
-                            print(f"now unhealthy = {now_unhealthy}")
-                            list_now_unhealthy.append(now_unhealthy)
-                            z +=1
-                        x = 0  
-                        for i in list_now_unhealthy: #send all unhealthy nodes
-                            await ctx.send(f"```diff\n- {list_now_unhealthy[x]} is now unhealthy\n```")
-                            x +=1
-                            time.sleep(0.5)
-                        
-            else:
+            v = 0
+            for i in temp: #loops through the list of nodes and adds them to array
+                if temp[f'{list_nodes[v]}']['dlt.green']['isHealthy'] is True:
+                    shrt_healthy = list_nodes[v]
+                    list_healthy.append(shrt_healthy)
+                if temp[f'{list_nodes[v]}']['dlt.green']['isHealthy'] is False:
+                    shrt_unhealthy = list_nodes[v]
+                    list_unhealthy.append(shrt_unhealthy)
+                v += 1
+            
+            difference_healthy = [x for x in list_healthy if x not in old_list_healthy]
+            difference_unhealthy = [x for x in list_unhealthy if x not in old_list_unhealthy]
+            print(difference_healthy)
+            print(difference_unhealthy)
+            
+            if flag == 0:
                 x = 0
-                for i in node_chanches: #send all unhealthy nodes
-                    await ctx.send(f"```diff\n- {node_chanches[x]} is not healthy\n```")
+                for i in difference_unhealthy: #send all unhealthy nodes
+                    await ctx.send(f"```diff\n- {difference_unhealthy[x]} is now unhealthy\n```")
                     x +=1
                     time.sleep(0.5)
+
+                x = 0  
+                for i in difference_healthy: #send all healthy nodes
+                    await ctx.send(f"```yaml\n+ {difference_healthy[x]} is now healthy\n```")
+                    x +=1
+                    time.sleep(0.5)
+                x = 0
+                old_list_healthy = list_healthy
+                old_list_unhealthy = list_unhealthy
+            else:
+                old_list_healthy = list_healthy
+                old_list_unhealthy = list_unhealthy
+                
         else:
             result = "```yaml\nAll nodes are healthy\n```"
             await ctx.send(result)
-            
+      
     old_all_nodes_status = all_nodes_status
-    flag = 1
-
+    
+    print(flag)
+    print(list_healthy)
+    print(list_unhealthy)
+    print(list(old_list_healthy))
+    print(list(old_list_unhealthy))
+    flag = 0
+    
 bot.run(TOKEN)
