@@ -1,5 +1,6 @@
 {
     "token": "",
-    "channel_id" : "",
+    "channel_id_mainnet" : "",
+    "channel_id_devnet" : "",
     "api" : ""
 }
