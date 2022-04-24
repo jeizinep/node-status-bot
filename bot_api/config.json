@@ -1,6 +1,7 @@
 {
-    "token": "",
-    "channel_id_mainnet" : "",
-    "channel_id_devnet" : "",
-    "api" : ""
+    "token": "OTQxNzE1ODkzNzE1NjE1ODE0.YgZ_RQ.NZqX2dWRHrfXm3KvBj35sgcvHUY",
+    "channel_id_mainnet" : "939986874573922405",
+    "channel_id_devnet" : "945415689810874368",
+    "api" : "https://dlt.green/dns/dltgreen_poolmana",
+    "logfileLocation" : "C:\\Users\\Snowli\\Desktop\\logfile.log"
 }
