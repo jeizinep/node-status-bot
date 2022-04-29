@@ -11,10 +11,12 @@ if os_type == "Windows":
     raw = open(dir + "\\config.json") #loads the temp.json
     config = json.load(raw)
     raw.close()
+    logfileLocation = config['logfileLocation'] + "\\logfile.log"
 if os_type == "Linux":
     raw = open(dir + "/config.json") #loads the temp.json
     config = json.load(raw)
     raw.close()
+    logfileLocation = config['logfileLocation'] + "/logfile.log"
 
 TOKEN = config['token']
 
@@ -27,7 +29,7 @@ old_list_unhealthy_mainnet = []
 old_list_unhealthy_devnet = []
 flag_mainnet = 1
 flag_devnet = 1
-logging.basicConfig(filename=config['logfileLocation'], encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(filename=logfileLocation, level=logging.DEBUG)
 
 @bot.event
 async def on_ready():
