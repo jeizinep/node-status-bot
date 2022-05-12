@@ -1,24 +1,9 @@
 import os
-import json
 import time
-import platform
-import logging
+import requests
 from discord.ext import commands, tasks
 
-os_type = platform.system()
-dir = os.path.dirname(os.path.abspath(__file__)) #finds the directory
-if os_type == "Windows":
-    raw = open(dir + "\\config.json") #loads the temp.json
-    config = json.load(raw)
-    raw.close()
-    logfileLocation = config['logfileLocation'] + "\\logfile.log"
-if os_type == "Linux":
-    raw = open(dir + "/config.json") #loads the temp.json
-    config = json.load(raw)
-    raw.close()
-    logfileLocation = config['logfileLocation'] + "/logfile.log"
-
-TOKEN = config['token']
+TOKEN = os.environ.get('TOKEN_activity')
 
 bot = commands.Bot(command_prefix='/')
 old_all_nodes_status_mainnet = []
@@ -29,20 +14,30 @@ old_list_unhealthy_mainnet = []
 old_list_unhealthy_devnet = []
 flag_mainnet = 1
 flag_devnet = 1
-logging.basicConfig(filename=logfileLocation, level=logging.DEBUG)
 
 @bot.event
 async def on_ready():
     global ctx_mainnet
     global ctx_devnet
-    channel_id_mainnet = (config['channel_id_mainnet'])
-    channel_id_devnet = (config['channel_id_devnet'])
+    channel_id_mainnet = os.environ.get('CHANNEL_ID_MAINNET')
+    channel_id_devnet = os.environ.get('CHANNEL_ID_DEVNET')
     ctx_mainnet = bot.get_channel(int(channel_id_mainnet))
     ctx_devnet = bot.get_channel(int(channel_id_devnet))
-    await ctx_mainnet.send("Broadcasting pool state")
-    await ctx_devnet.send("Broadcasting pool state")
+    await ctx_mainnet.send("Broadcasting pool state", delete_after=5)
+    await ctx_devnet.send("Broadcasting pool state", delete_after=5)
     update.start()
     
+@commands.has_permissions(administrator=True)
+@bot.command()
+async def clear(ctx, limit: int):
+    await ctx.channel.purge(limit=limit)
+    await ctx.send('Cleared by {}'.format(ctx.author.mention), delete_after=10)
+    await ctx.message.delete()
+
+@clear.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("You cant do that!", delete_after=10)
 
 @tasks.loop(seconds=20)
 async def update():
@@ -54,9 +49,10 @@ async def update():
     list_nodes_mainnet = []
     list_healthy_mainnet = []
     list_unhealthy_mainnet = []
-    raw = open(config['directory_path_html_file']) #loads the temp.json
-    temp = json.load(raw)
-    raw.close()
+    print("Contacting Api")
+    api = os.environ.get('API_URL')
+    raw = requests.get(api) #gets the api request
+    temp = raw.json()
     for i in temp:
         list_nodes_mainnet.append(i) #loops through the list of nodes and adds them to array
 
@@ -67,7 +63,7 @@ async def update():
         all_nodes_status_mainnet.append(shrt)
         y += 1
     if all_nodes_status_mainnet != old_all_nodes_status_mainnet: #
-        logging.debug(f"all_nodes_status = {all_nodes_status_mainnet}")
+        print(f"all_nodes_status = {all_nodes_status_mainnet}")
         lie = all(all_nodes_status_mainnet) # checks if there is a False in the array
         if lie == False: #if there is a False in the array lie = False
             v = 0
@@ -82,19 +78,19 @@ async def update():
             
             difference_healthy_mainnet = [x for x in list_healthy_mainnet if x not in old_list_healthy_mainnet]
             difference_unhealthy_mainnet = [x for x in list_unhealthy_mainnet if x not in old_list_unhealthy_mainnet]
-            logging.debug(difference_healthy_mainnet)
-            logging.debug(difference_unhealthy_mainnet)
+            print(difference_healthy_mainnet)
+            print(difference_unhealthy_mainnet)
             
             if flag_mainnet == 0:
                 x = 0
                 for i in difference_unhealthy_mainnet: #send all unhealthy nodes
-                    await ctx_mainnet.send(f"```diff\n- {difference_unhealthy_mainnet[x]} is now unhealthy\n```")
+                    await ctx_mainnet.send(f"```diff\n- {difference_unhealthy_mainnet[x]} is now unhealthy\n```", delete_after=172800)
                     x +=1
                     time.sleep(0.5)
 
                 x = 0  
                 for i in difference_healthy_mainnet: #send all healthy nodes
-                    await ctx_mainnet.send(f"```yaml\n+ {difference_healthy_mainnet[x]} is now healthy\n```")
+                    await ctx_mainnet.send(f"```yaml\n+ {difference_healthy_mainnet[x]} is now healthy\n```", delete_after=172800)
                     x +=1
                     time.sleep(0.5)
                 x = 0
@@ -104,17 +100,17 @@ async def update():
                 old_list_healthy_mainnet = list_healthy_mainnet
                 old_list_unhealthy_mainnet = list_unhealthy_mainnet
                 
-        else:
-            await ctx_mainnet.send("```yaml\nAll nodes are healthy\n```")
+        if list_unhealthy_mainnet == []:
+            await ctx_mainnet.send("```yaml\nAll nodes are healthy\n```", delete_after=172800)
     
       
     old_all_nodes_status_mainnet = all_nodes_status_mainnet
     
-    logging.debug(flag_mainnet)
-    logging.debug(list_healthy_mainnet)
-    logging.debug(list_unhealthy_mainnet)
-    logging.debug(list(old_list_healthy_mainnet))
-    logging.debug(list(old_list_unhealthy_mainnet))
+    print(flag_mainnet)
+    print(list_healthy_mainnet)
+    print(list_unhealthy_mainnet)
+    print(list(old_list_healthy_mainnet))
+    print(list(old_list_unhealthy_mainnet))
     flag_mainnet = 0
 
     global flag_devnet
@@ -135,7 +131,7 @@ async def update():
         all_nodes_status_devnet.append(shrt)
         y += 1
     if all_nodes_status_devnet != old_all_nodes_status_devnet: #
-        logging.debug(f"all_nodes_status = {all_nodes_status_devnet}")
+        print(f"all_nodes_status = {all_nodes_status_devnet}")
         lie = all(all_nodes_status_devnet) # checks if there is a False in the array
         if lie == False: #if there is a False in the array lie = False
             v = 0
@@ -150,19 +146,19 @@ async def update():
             
             difference_healthy_devnet = [x for x in list_healthy_devnet if x not in old_list_healthy_devnet]
             difference_unhealthy_devnet = [x for x in list_unhealthy_devnet if x not in old_list_unhealthy_devnet]
-            logging.debug(difference_healthy_devnet)
-            logging.debug(difference_unhealthy_devnet)
+            print(difference_healthy_devnet)
+            print(difference_unhealthy_devnet)
             
             if flag_devnet == 0:
                 x = 0
                 for i in difference_unhealthy_devnet: #send all unhealthy nodes
-                    await ctx_devnet.send(f"```diff\n- {difference_unhealthy_devnet[x]} is now unhealthy\n```")
+                    await ctx_devnet.send(f"```diff\n- {difference_unhealthy_devnet[x]} is now unhealthy\n```", delete_after=172800)
                     x +=1
                     time.sleep(0.5)
 
                 x = 0  
                 for i in difference_healthy_devnet: #send all healthy nodes
-                    await ctx_devnet.send(f"```yaml\n+ {difference_healthy_devnet[x]} is now healthy\n```")
+                    await ctx_devnet.send(f"```yaml\n+ {difference_healthy_devnet[x]} is now healthy\n```", delete_after=172800)
                     x +=1
                     time.sleep(0.5)
                 x = 0
@@ -172,17 +168,17 @@ async def update():
                 old_list_healthy_devnet = list_healthy_devnet
                 old_list_unhealthy_devnet = list_unhealthy_devnet
                 
-        else:
+        if list_unhealthy_devnet == []:
             await ctx_devnet.send("```yaml\nAll nodes are healthy\n```")
     
       
     old_all_nodes_status_devnet = all_nodes_status_devnet
     
-    logging.debug(flag_devnet)
-    logging.debug(list_healthy_devnet)
-    logging.debug(list_unhealthy_devnet)
-    logging.debug(list(old_list_healthy_devnet))
-    logging.debug(list(old_list_unhealthy_devnet))
+    print(flag_devnet)
+    print(list_healthy_devnet)
+    print(list_unhealthy_devnet)
+    print(list(old_list_healthy_devnet))
+    print(list(old_list_unhealthy_devnet))
     flag_devnet = 0
 
 bot.run(TOKEN)

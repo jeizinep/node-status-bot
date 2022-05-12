@@ -2,6 +2,5 @@
     "token": "",
     "channel_id_mainnet" : "",
     "channel_id_devnet" : "",
-    "api" : "",
-    "logfileLocation" : ""
+    "api" : ""
 }

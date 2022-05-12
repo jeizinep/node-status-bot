@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+ bot_activity:
+  build:
+   context: ./bot_activity
+  container_name: discord-bot-activity
+  environment:
+    TOKEN_activity: 
+    CHANNEL_ID_MAINNET: 
+    CHANNEL_ID_DEVNET: 
+    API_URL: 
+
+ bot_stalker:
+  build:
+   context: ./bot_stalker
+  container_name: discord-bot-stalker
+  environment:
+    TOKEN_STALKER: 
+    API_URL: 
+    TREASURY_ADDRESS: 
+    PRICE_API: 
