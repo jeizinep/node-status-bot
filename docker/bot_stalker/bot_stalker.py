@@ -6,6 +6,13 @@ from discord.ext import commands, tasks
 
 TOKEN = os.environ.get('TOKEN_STALKER')
 
+def human_format(num):
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    return '%.2f%s' % (num, ['i', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi'][magnitude])
+
 bot = commands.Bot(command_prefix='/')
 
 @bot.event
@@ -27,11 +34,8 @@ async def name():
     balance_raw = requests.get(balance_url)
     balance_json = balance_raw.json()
     balance = balance_json['data']['balance']
-    if balance > 1000000:
-        balance = f'{round(balance / 1000000)} Mi'
-    else:
-        balance = f'{round(balance / 1000000000)} Gi'
-    await bot.user.edit(username=f'Treasury {balance}')
+    balance_formatted = f'{human_format(balance)}'
+    await bot.user.edit(username=f'Treasury {balance_formatted}')
     
 @tasks.loop()
 async def activity():
