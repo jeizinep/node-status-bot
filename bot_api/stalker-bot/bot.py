@@ -36,14 +36,13 @@ async def on_ready():
 @tasks.loop(minutes=30)
 async def name():
     list_nodes_mainnet = []
-    
     api = config['api_data']
     raw = requests.get(api) #gets the api request
     temp = raw.json()
     for i in temp:
         list_nodes_mainnet.append(i) #loops through the list of nodes and adds them to array
     
-    balance_url = "https://" + list_nodes_mainnet[0] + "/api/v1/addresses/" + config['treasury_address']
+    balance_url = "https://" + temp[list_nodes_mainnet[0]]["Hornet"]["Domain"] + "/api/v1/addresses/" + config['treasury_address']
     balance_raw = requests.get(balance_url)
     balance_json = balance_raw.json()
     balance = balance_json['data']['balance']

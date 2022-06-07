@@ -1,8 +1,11 @@
 import os
 import json
+from pickle import NONE
 import time
 import platform
 import requests
+import discord
+import asyncio
 from discord.ext import commands, tasks
 
 os_type = platform.system()
@@ -38,7 +41,8 @@ async def on_ready():
     ctx_devnet = bot.get_channel(int(channel_id_devnet))
     await ctx_mainnet.send("Broadcasting pool state", delete_after=5)
     await ctx_devnet.send("Broadcasting pool state", delete_after=5)
-    update.start()
+    #update.start()
+    activity.start()
     
 @commands.has_permissions(administrator=True)
 @bot.command()
@@ -52,7 +56,61 @@ async def clear_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that!", delete_after=10)
 
-@tasks.loop(seconds=20)
+@tasks.loop()
+async def activity():
+    api = config['api']
+    api_raw = requests.get(api)
+    api_json = api_raw.json()
+    list_nodes_mainnet = []
+    
+    for i in api_json:
+        list_nodes_mainnet.append(i) #loops through the list of users and adds them to array
+    
+    number_healthy_mainnet = 0
+    number_unhealthy_mainnet = 0
+    number_healthy_devnet = 0
+    number_unhealthy_devnet = 0
+    number_healthy_shimmer = 0
+    number_unhealthy_shimmer = 0
+    x = 0
+    for i in api_json:
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isMainnetHealthy"]:
+            number_healthy_mainnet += 1
+        else:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isMainnetHealthy"] != None:
+                number_unhealthy_mainnet += 1
+        
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isDevnetHealthy"]:
+            number_healthy_devnet += 1
+        else:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isDevnetHealthy"] != None:
+                number_unhealthy_devnet += 1
+            
+        
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isShimmerHealthy"]:
+            number_healthy_shimmer += 1
+        else:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isShimmerHealthy"] != None:
+                number_unhealthy_shimmer += 1
+        x += 1
+    
+    print(f'Healthy mainnet:  {number_healthy_mainnet} | Unhealthy mainnet:  {number_unhealthy_mainnet}')
+    print(f'Healthy devnet:  {number_healthy_devnet} | Unhealthy devnet:  {number_unhealthy_devnet}')
+    print(f'Healthy shimmer:  {number_healthy_shimmer} | Unhealthy shimmer:  {number_unhealthy_shimmer}')
+    
+    total_healthy_mainnet = number_healthy_mainnet + number_unhealthy_mainnet
+    total_healthy_devnet = number_healthy_devnet + number_unhealthy_devnet
+    total_healthy_shimmer = number_healthy_shimmer + number_unhealthy_shimmer
+    
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Mainnet: {number_healthy_mainnet}/{total_healthy_mainnet} 💚'))
+    await asyncio.sleep(10)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Devnet: {number_healthy_devnet}/{total_healthy_devnet} 💚'))
+    await asyncio.sleep(10)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer: {number_healthy_shimmer}/{total_healthy_shimmer} 💚'))
+    await asyncio.sleep(10)
+
+
+@tasks.loop(seconds=60)
 async def update():
     global flag_mainnet
     global ctx_mainnet
