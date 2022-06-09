@@ -1,9 +1,35 @@
 import os
+import json
+from pickle import NONE
 import time
+import platform
 import requests
+import discord
+import asyncio
 from discord.ext import commands, tasks
 
-TOKEN = os.environ.get('TOKEN_activity')
+os_type = platform.system()
+dir = os.path.dirname(os.path.abspath(__file__)) #finds the directory
+if os_type == "Windows":
+    raw = open(dir + "\\config.json") #loads the temp.json
+    config = json.load(raw)
+    raw.close()
+if os_type == "Linux":
+    raw = open(dir + "/config.json") #loads the temp.json
+    config = json.load(raw)
+    raw.close()
+
+TOKEN = config['token']
+
+def hearts(num):
+    if num <= 1/3:
+        return '❤️'
+    
+    if num <=  2/3:
+        return '💛'
+    else:
+        return '💚'
+    
 
 bot = commands.Bot(command_prefix='/')
 old_all_nodes_status_mainnet = []
@@ -19,13 +45,14 @@ flag_devnet = 1
 async def on_ready():
     global ctx_mainnet
     global ctx_devnet
-    channel_id_mainnet = os.environ.get('CHANNEL_ID_MAINNET')
-    channel_id_devnet = os.environ.get('CHANNEL_ID_DEVNET')
+    channel_id_mainnet = config['channel_id_mainnet']
+    channel_id_devnet = config['channel_id_devnet']
     ctx_mainnet = bot.get_channel(int(channel_id_mainnet))
     ctx_devnet = bot.get_channel(int(channel_id_devnet))
     await ctx_mainnet.send("Broadcasting pool state", delete_after=5)
     await ctx_devnet.send("Broadcasting pool state", delete_after=5)
-    update.start()
+    #update.start()
+    activity.start()
     
 @commands.has_permissions(administrator=True)
 @bot.command()
@@ -39,7 +66,66 @@ async def clear_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that!", delete_after=10)
 
-@tasks.loop(seconds=20)
+@tasks.loop()
+async def activity():
+    api = config['api']
+    api_raw = requests.get(api)
+    api_json = api_raw.json()
+    list_nodes_mainnet = []
+    
+    for i in api_json:
+        list_nodes_mainnet.append(i) #loops through the list of users and adds them to array
+    
+    number_healthy_mainnet = 0
+    number_unhealthy_mainnet = 0
+    number_healthy_devnet = 0
+    number_unhealthy_devnet = 0
+    number_healthy_shimmer = 0
+    number_unhealthy_shimmer = 0
+    x = 0
+    for i in api_json:
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isMainnetHealthy"]:
+            number_healthy_mainnet += 1
+        else:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isMainnetHealthy"] != None:
+                number_unhealthy_mainnet += 1
+        
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isDevnetHealthy"]:
+            number_healthy_devnet += 1
+        else:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isDevnetHealthy"] != None:
+                number_unhealthy_devnet += 1
+            
+        
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isShimmerHealthy"]:
+            number_healthy_shimmer += 1
+        else:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isShimmerHealthy"] != None:
+                number_unhealthy_shimmer += 1
+        x += 1
+    
+    print(f'Healthy mainnet:  {number_healthy_mainnet} | Unhealthy mainnet:  {number_unhealthy_mainnet}')
+    print(f'Healthy devnet:  {number_healthy_devnet} | Unhealthy devnet:  {number_unhealthy_devnet}')
+    print(f'Healthy shimmer:  {number_healthy_shimmer} | Unhealthy shimmer:  {number_unhealthy_shimmer}')
+    
+    total_healthy_mainnet = number_healthy_mainnet + number_unhealthy_mainnet
+    total_healthy_devnet = number_healthy_devnet + number_unhealthy_devnet
+    total_healthy_shimmer = number_healthy_shimmer + number_unhealthy_shimmer
+    
+    percent_healthy_mainnet = number_healthy_mainnet / total_healthy_mainnet
+    percent_healthy_devnet = number_healthy_devnet / total_healthy_devnet
+    percent_healthy_shimmer = number_healthy_shimmer / total_healthy_shimmer
+    
+    
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Mainnet: {number_healthy_mainnet}/{total_healthy_mainnet} {hearts(percent_healthy_mainnet)}'))
+    await asyncio.sleep(10)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Devnet: {number_healthy_devnet}/{total_healthy_devnet} {hearts(percent_healthy_devnet)}'))
+    await asyncio.sleep(10)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer: {number_healthy_shimmer}/{total_healthy_shimmer} {hearts(percent_healthy_shimmer)}'))
+    await asyncio.sleep(10)
+
+
+@tasks.loop(seconds=60)
 async def update():
     global flag_mainnet
     global ctx_mainnet
@@ -50,7 +136,7 @@ async def update():
     list_healthy_mainnet = []
     list_unhealthy_mainnet = []
     print("Contacting Api")
-    api = os.environ.get('API_URL')
+    api = config['api']
     raw = requests.get(api) #gets the api request
     temp = raw.json()
     for i in temp:

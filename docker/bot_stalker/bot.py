@@ -1,10 +1,23 @@
 import asyncio
+import platform
+import json
 import os
 import requests
 import discord
 from discord.ext import commands, tasks
 
-TOKEN = os.environ.get('TOKEN_STALKER')
+os_type = platform.system()
+dir = os.path.dirname(os.path.abspath(__file__)) #finds the directory
+if os_type == "Windows":
+    raw = open(dir + "\\config.json") #loads the temp.json
+    config = json.load(raw)
+    raw.close()
+if os_type == "Linux":
+    raw = open(dir + "/config.json") #loads the temp.json
+    config = json.load(raw)
+    raw.close()
+
+TOKEN = config['token']
 
 def human_format(num):
     magnitude = 0
@@ -23,14 +36,13 @@ async def on_ready():
 @tasks.loop(minutes=30)
 async def name():
     list_nodes_mainnet = []
-    
-    api = os.environ.get('API_URL')
+    api = config['api_data']
     raw = requests.get(api) #gets the api request
     temp = raw.json()
     for i in temp:
         list_nodes_mainnet.append(i) #loops through the list of nodes and adds them to array
     
-    balance_url = "https://" + list_nodes_mainnet[0] + "/api/v1/addresses/" + os.environ.get('TREASURY_ADDRESS')
+    balance_url = "https://" + temp[list_nodes_mainnet[0]]["Hornet"]["Domain"] + "/api/v1/addresses/" + config['treasury_address']
     balance_raw = requests.get(balance_url)
     balance_json = balance_raw.json()
     balance = balance_json['data']['balance']
@@ -39,7 +51,7 @@ async def name():
     
 @tasks.loop()
 async def activity():
-    price_url = os.environ.get('PRICE_API')
+    price_url = config['api_price']
     price_raw = requests.get(price_url)
     price_json = price_raw.json()
     price_usd = round(price_json['market_data']['current_price']['usd'], 3)

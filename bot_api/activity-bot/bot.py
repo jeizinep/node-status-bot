@@ -21,6 +21,16 @@ if os_type == "Linux":
 
 TOKEN = config['token']
 
+def hearts(num):
+    if num <= 1/3:
+        return '❤️'
+    
+    if num <=  2/3:
+        return '💛'
+    else:
+        return '💚'
+    
+
 bot = commands.Bot(command_prefix='/')
 old_all_nodes_status_mainnet = []
 old_all_nodes_status_devnet = []
@@ -102,11 +112,16 @@ async def activity():
     total_healthy_devnet = number_healthy_devnet + number_unhealthy_devnet
     total_healthy_shimmer = number_healthy_shimmer + number_unhealthy_shimmer
     
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Mainnet: {number_healthy_mainnet}/{total_healthy_mainnet} 💚'))
+    percent_healthy_mainnet = number_healthy_mainnet / total_healthy_mainnet
+    percent_healthy_devnet = number_healthy_devnet / total_healthy_devnet
+    percent_healthy_shimmer = number_healthy_shimmer / total_healthy_shimmer
+    
+    
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Mainnet: {number_healthy_mainnet}/{total_healthy_mainnet} {hearts(percent_healthy_mainnet)}'))
     await asyncio.sleep(10)
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Devnet: {number_healthy_devnet}/{total_healthy_devnet} 💚'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Devnet: {number_healthy_devnet}/{total_healthy_devnet} {hearts(percent_healthy_devnet)}'))
     await asyncio.sleep(10)
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer: {number_healthy_shimmer}/{total_healthy_shimmer} 💚'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer: {number_healthy_shimmer}/{total_healthy_shimmer} {hearts(percent_healthy_shimmer)}'))
     await asyncio.sleep(10)
 
 
