@@ -51,7 +51,7 @@ async def on_ready():
     ctx_devnet = bot.get_channel(int(channel_id_devnet))
     await ctx_mainnet.send("Broadcasting pool state", delete_after=5)
     await ctx_devnet.send("Broadcasting pool state", delete_after=5)
-    #update.start()
+    update.start()
     activity.start()
     
 @commands.has_permissions(administrator=True)
