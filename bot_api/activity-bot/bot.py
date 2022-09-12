@@ -117,11 +117,11 @@ async def activity():
     percent_healthy_shimmer = number_healthy_shimmer / total_healthy_shimmer
     
     
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'IotaMainnet: {number_healthy_mainnet}/{total_healthy_mainnet} {hearts(percent_healthy_mainnet)}'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Iota Mainnet: {number_healthy_mainnet}/{total_healthy_mainnet} {hearts(percent_healthy_mainnet)}'))
     await asyncio.sleep(10)
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'IotaDevnet: {number_healthy_devnet}/{total_healthy_devnet} {hearts(percent_healthy_devnet)}'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Iota Devnet: {number_healthy_devnet}/{total_healthy_devnet} {hearts(percent_healthy_devnet)}'))
     await asyncio.sleep(10)
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer: {number_healthy_shimmer}/{total_healthy_shimmer} {hearts(percent_healthy_shimmer)}'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer Testnet: {number_healthy_shimmer}/{total_healthy_shimmer} {hearts(percent_healthy_shimmer)}'))
     await asyncio.sleep(10)
 
 
