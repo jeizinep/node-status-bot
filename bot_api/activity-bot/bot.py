@@ -84,16 +84,16 @@ async def activity():
     number_unhealthy_shimmer = 0
     x = 0
     for i in api_json:
-        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isMainnetHealthy"]:
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isIotaHealthy"]:
             number_healthy_mainnet += 1
         else:
-            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isMainnetHealthy"] != None:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isIotaHealthy"] != None:
                 number_unhealthy_mainnet += 1
         
-        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isDevnetHealthy"]:
+        if api_json[list_nodes_mainnet[x]]["dlt.green"]["isIotaDevnetHealthy"]:
             number_healthy_devnet += 1
         else:
-            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isDevnetHealthy"] != None:
+            if api_json[list_nodes_mainnet[x]]["dlt.green"]["isIotaDevnetHealthy"] != None:
                 number_unhealthy_devnet += 1
             
         
@@ -117,9 +117,9 @@ async def activity():
     percent_healthy_shimmer = number_healthy_shimmer / total_healthy_shimmer
     
     
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Mainnet: {number_healthy_mainnet}/{total_healthy_mainnet} {hearts(percent_healthy_mainnet)}'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'IotaMainnet: {number_healthy_mainnet}/{total_healthy_mainnet} {hearts(percent_healthy_mainnet)}'))
     await asyncio.sleep(10)
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Devnet: {number_healthy_devnet}/{total_healthy_devnet} {hearts(percent_healthy_devnet)}'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'IotaDevnet: {number_healthy_devnet}/{total_healthy_devnet} {hearts(percent_healthy_devnet)}'))
     await asyncio.sleep(10)
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer: {number_healthy_shimmer}/{total_healthy_shimmer} {hearts(percent_healthy_shimmer)}'))
     await asyncio.sleep(10)
@@ -145,7 +145,7 @@ async def update():
     all_nodes_status_mainnet = []
     y = 0
     for i in temp: #loops through the list of nodes and adds them to array
-        shrt = temp[f'{list_nodes_mainnet[y]}']['dlt.green']['isMainnetHealthy']
+        shrt = temp[f'{list_nodes_mainnet[y]}']['dlt.green']['isIotaHealthy']
         all_nodes_status_mainnet.append(shrt)
         y += 1
     if all_nodes_status_mainnet != old_all_nodes_status_mainnet: #
@@ -154,10 +154,10 @@ async def update():
         if lie == False: #if there is a False in the array lie = False
             v = 0
             for i in temp: #loops through the list of nodes and adds them to array
-                if temp[f'{list_nodes_mainnet[v]}']['dlt.green']['isMainnetHealthy'] is True:
+                if temp[f'{list_nodes_mainnet[v]}']['dlt.green']['isIotaHealthy'] is True:
                     shrt_healthy_mainnet = list_nodes_mainnet[v]
                     list_healthy_mainnet.append(shrt_healthy_mainnet)
-                if temp[f'{list_nodes_mainnet[v]}']['dlt.green']['isMainnetHealthy'] is False:
+                if temp[f'{list_nodes_mainnet[v]}']['dlt.green']['isIotaHealthy'] is False:
                     shrt_unhealthy_mainnet = list_nodes_mainnet[v]
                     list_unhealthy_mainnet.append(shrt_unhealthy_mainnet)
                 v += 1
@@ -213,7 +213,7 @@ async def update():
     all_nodes_status_devnet = []
     y = 0
     for i in temp: #loops through the list of nodes and adds them to array
-        shrt = temp[f'{list_nodes_devnet[y]}']['dlt.green']['isDevnetHealthy']
+        shrt = temp[f'{list_nodes_devnet[y]}']['dlt.green']['istIotaDevneHealthy']
         all_nodes_status_devnet.append(shrt)
         y += 1
     if all_nodes_status_devnet != old_all_nodes_status_devnet: #
@@ -222,10 +222,10 @@ async def update():
         if lie == False: #if there is a False in the array lie = False
             v = 0
             for i in temp: #loops through the list of nodes and adds them to array
-                if temp[f'{list_nodes_devnet[v]}']['dlt.green']['isDevnetHealthy'] is True:
+                if temp[f'{list_nodes_devnet[v]}']['dlt.green']['istIotaDevneHealthy'] is True:
                     shrt_healthy_devnet = list_nodes_devnet[v]
                     list_healthy_devnet.append(shrt_healthy_devnet)
-                if temp[f'{list_nodes_devnet[v]}']['dlt.green']['isDevnetHealthy'] is False:
+                if temp[f'{list_nodes_devnet[v]}']['dlt.green']['istIotaDevneHealthy'] is False:
                     shrt_unhealthy_devnet = list_nodes_devnet[v]
                     list_unhealthy_devnet.append(shrt_unhealthy_devnet)
                 v += 1
