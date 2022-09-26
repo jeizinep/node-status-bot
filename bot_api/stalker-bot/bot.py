@@ -42,7 +42,7 @@ async def name():
     for i in temp:
         list_nodes_mainnet.append(i) #loops through the list of nodes and adds them to array
     
-    balance_url = "https://" + temp[list_nodes_mainnet[0]]["Hornet"]["Domain"] + "/api/v1/addresses/" + config['treasury_address']
+    balance_url = "https://" + temp[list_nodes_mainnet[0]]["IotaHornet"]["Domain"] + "/api/v1/addresses/" + config['treasury_address']
     balance_raw = requests.get(balance_url)
     balance_json = balance_raw.json()
     balance = balance_json['data']['balance']
