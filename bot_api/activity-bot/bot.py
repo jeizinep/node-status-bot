@@ -121,7 +121,7 @@ async def activity():
     await asyncio.sleep(10)
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'IOTA Dev: {number_healthy_devnet}/{total_healthy_devnet} {hearts(percent_healthy_devnet)}'))
     await asyncio.sleep(10)
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer Beta: {number_healthy_shimmer}/{total_healthy_shimmer} {hearts(percent_healthy_shimmer)}'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'Shimmer: {number_healthy_shimmer}/{total_healthy_shimmer} {hearts(percent_healthy_shimmer)}'))
     await asyncio.sleep(10)
 
 
